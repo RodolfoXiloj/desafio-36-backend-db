@@ -19,7 +19,7 @@ import categoryRoutes from "./routes/categoryRoutes";
 import stateRoutes from "./routes/stateRoutes";
 import userRoutes from "./routes/userRoutes";
 import orderRoutes from "./routes/orderRoutes";
-import clientRoutes from "./routes/clientRoutes";
+import clientRoutes from "./routes/customerRoutes";
 import authRoutes from "./routes/authRoutes";
 
 const app = express();

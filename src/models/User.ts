@@ -12,7 +12,7 @@ fecha_nacimiento DATE,
 fecha_creacion DATETIME DEFAULT GETDATE(),
 --Referencia a la tabla Clientes
 id_clientes INT FOREIGN KEY REFERENCES Clientes(idClientes) */
-import { DataTypes, Model, Optional } from "sequelize";
+/* mport { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "../config/db";
 
 interface UserAttributes {
@@ -102,6 +102,32 @@ User.init(
 /* // Relaciones
 User.belongsTo(Rol, { foreignKey: "id_rol" });
 User.belongsTo(Estados, { foreignKey: "id_estados" });
-User.belongsTo(Clientes, { foreignKey: "id_clientes" }); */
+User.belongsTo(Clientes, { foreignKey: "id_clientes" }); 
+
+export default User;
+ */
+
+import { DataTypes, Model } from "sequelize";
+import sequelize from "../config/db";
+import Cliente from "./Customer";
+import Estado from "./State";
+import Rol from "./Role";
+
+class User extends Model {}
+User.init(
+  {
+    id_usuarios: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    id_rol: { type: DataTypes.INTEGER, references: { model: Rol, key: "id_rol" } },
+    id_estados: { type: DataTypes.INTEGER, references: { model: Estado, key: "id_estados" } },
+    correo_electronico: { type: DataTypes.STRING, unique: true, allowNull: false },
+    nombre_completo: { type: DataTypes.STRING, allowNull: false },
+    password: { type: DataTypes.STRING, allowNull: false },
+    telefono: { type: DataTypes.STRING },
+    fecha_nacimiento: { type: DataTypes.DATE },
+    fecha_creacion: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
+    id_clientes: { type: DataTypes.INTEGER, references: { model: Cliente, key: "id_clientes" } },
+  },
+  { sequelize, modelName: "Usuario", tableName: "Usuarios", timestamps: false }
+);
 
 export default User;

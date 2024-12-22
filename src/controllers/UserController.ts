@@ -1,6 +1,8 @@
 import bcrypt  from "bcryptjs";
 import { Request, Response } from "express";
 import sequelize from "../config/db";
+import User from "../models/User";
+import Usuario from "../models/User";
 
 // Crear Usuario
 export const createUser = async (req: Request, res: Response) => {
@@ -100,3 +102,34 @@ export const updateUser = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Error al actualizar el usuario" });
   }
 };
+
+export const getUsuarioById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const usuario = await User.findByPk(id);
+
+    if (!usuario) return res.status(404).json({ error: "Usuario no encontrado" });
+
+    res.json(usuario);
+  } catch (error) {
+    res.status(500).json({ error: "Error al buscar usuario" });
+  }
+};
+
+/* export const disableUsuario = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const usuario = await Usuario.findByPk(id);
+
+    if (!usuario) return res.status(404).json({ error: "Usuario no encontrado" });
+
+    usuario.id_estados = 2; // 2 = Inactivo
+    await usuario.save();
+
+    res.json({ message: "Usuario inhabilitado correctamente", usuario });
+  } catch (error) {
+    res.status(500).json({ error: "Error al inhabilitar usuario" });
+  }
+}; */
+
+

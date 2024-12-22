@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import sequelize from "../config/db";
+import Product from "../models/Product";
 
 // Crear Producto
 export const createProduct = async (req: Request, res: Response) => {
@@ -95,5 +96,14 @@ export const updateProduct = async (req: Request, res: Response) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error al actualizar producto" });
+  }
+};
+
+export const getActiveProducts = async (req: Request, res: Response) => {
+  try {
+    const productos = await Product.findAll({ where: { id_estados: 1 } }); // 1 = Activo
+    res.json(productos);
+  } catch (error) {
+    res.status(500).json({ error: "Error al obtener productos activos" });
   }
 };
