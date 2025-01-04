@@ -77,6 +77,7 @@ CREATE TABLE CategoriaProductos (
     nombre VARCHAR(45) NOT NULL,
     fecha_creacion DATETIME DEFAULT GETDATE()
 );
+
 --Crear Tabla Productos
 CREATE TABLE Productos (
     --Identificador Unico para la tabla Productos
@@ -503,3 +504,111 @@ BEGIN
         THROW;
     END CATCH;
 END;
+
+GO
+CREATE VIEW vw_Usuarios AS
+SELECT 
+    u.id_usuarios,
+    u.id_rol,
+    r.nombre,
+    u.id_estados,
+    e.nombre nombre_estado,
+    u.correo_electronico,
+    u.nombre_completo,
+    u.telefono,
+    u.fecha_nacimiento,
+    u.fecha_creacion,
+    u.id_clientes,
+    c.nombre_comercial
+FROM Usuarios u
+LEFT JOIN Rol r ON u.id_rol = r.id_rol
+LEFT JOIN Estados e ON u.id_estados = e.id_estados
+LEFT JOIN Clientes c ON u.id_clientes = c.id_clientes;
+
+GO
+CREATE VIEW vw_Roles AS
+SELECT 
+    id_rol,
+    nombre
+FROM Rol;
+
+
+GO
+CREATE VIEW vw_CategoriaProductos AS
+SELECT 
+    cp.id_categoria_productos,
+    cp.id_usuarios,
+    u.nombre_completo AS nombre_usuario,
+    cp.id_estados,
+    e.nombre AS estado,
+    cp.nombre AS nombre_categoria,
+    cp.fecha_creacion
+FROM CategoriaProductos cp
+LEFT JOIN Usuarios u ON cp.id_usuarios = u.id_usuarios
+LEFT JOIN Estados e ON cp.id_estados = e.id_estados;
+
+GO
+CREATE VIEW vw_ProductosActivos AS
+SELECT 
+    p.id_productos,
+    p.id_categoria_productos,
+    cp.nombre AS categoria,
+    p.id_usuarios,
+    u.nombre_completo AS usuario,
+    p.nombre AS producto,
+    p.marca,
+    p.codigo,
+    p.stock,
+    p.precio,
+    p.fecha_creacion,
+    p.foto
+FROM Productos p
+LEFT JOIN CategoriaProductos cp ON p.id_categoria_productos = cp.id_categoria_productos
+LEFT JOIN Usuarios u ON p.id_usuarios = u.id_usuarios
+WHERE p.id_estados = 1 --Activo
+ AND p.stock > 0; -- Stock mayor a 0
+
+GO
+CREATE VIEW vw_Clientes AS
+SELECT 
+    id_clientes,
+    razon_social,
+    nombre_comercial,
+    direccion_entrega,
+    telefono,
+    email
+FROM Clientes;
+
+GO
+CREATE VIEW vw_Ordenes AS
+SELECT 
+    o.id_orden,
+    o.id_usuarios,
+    u.nombre_completo AS usuario,
+    o.id_estados,
+    e.nombre AS estado,
+    o.fecha_creacion,
+    o.nombre_completo,
+    o.direccion,
+    o.telefono,
+    o.correo_electronico,
+    o.fecha_entrega,
+    o.total_orden
+FROM Orden o
+LEFT JOIN Usuarios u ON o.id_usuarios = u.id_usuarios
+LEFT JOIN Estados e ON o.id_estados = e.id_estados;
+
+GO
+CREATE VIEW vw_OrdenDetalles AS
+SELECT 
+    od.id_orden_detalles,
+    od.id_orden,
+    od.id_productos,
+    p.nombre AS producto,
+    p.marca,
+    p.codigo,
+    od.cantidad,
+    od.precio,
+    od.subtotal
+FROM OrdenDetalles od
+LEFT JOIN Productos p ON od.id_productos = p.id_productos;

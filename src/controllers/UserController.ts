@@ -1,8 +1,7 @@
 import bcrypt  from "bcryptjs";
 import { Request, Response } from "express";
+import { QueryTypes } from "sequelize";
 import sequelize from "../config/db";
-import User from "../models/User";
-import Usuario from "../models/User";
 
 // Crear Usuario
 export const createUser = async (req: Request, res: Response) => {
@@ -106,7 +105,14 @@ export const updateUser = async (req: Request, res: Response) => {
 export const getUsuarioById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const usuario = await User.findByPk(id);
+    const usuario = await sequelize.query(
+      `SELECT * FROM vw_Usuarios WHERE id_usuarios = :id`,
+      {
+        replacements: { id }, // Parámetro pasado de forma segura
+        type: QueryTypes.SELECT, // Define el tipo de consulta
+      }
+    );
+    
 
     if (!usuario) return res.status(404).json({ error: "Usuario no encontrado" });
 

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import sequelize from "../config/db";
-import CategoryProducts from "../models/CategoryProducts";
+import { QueryTypes } from "sequelize";
 
 // Crear Categoría de Producto
 export const createCategory = async (req: Request, res: Response) => {
@@ -57,7 +57,10 @@ export const updateCategory = async (req: Request, res: Response) => {
 
 export const getAllCategorias = async (req: Request, res: Response) => {
   try {
-    const categorias = await CategoryProducts.findAll();
+    const categorias = await sequelize.query(
+      `SELECT * FROM vw_CategoriaProductos`,
+      { type: QueryTypes.SELECT }
+    );
     res.json(categorias);
   } catch (error) {
     res.status(500).json({ error: "Error al obtener categorías" });
@@ -67,7 +70,13 @@ export const getAllCategorias = async (req: Request, res: Response) => {
 export const getCategoriaById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const categoria = await CategoryProducts.findByPk(id);
+    const [categoria] = await sequelize.query(
+      `SELECT * FROM vw_CategoriaProductos WHERE id_categoria_productos = :id`,
+      {
+        replacements: { id },
+        type: QueryTypes.SELECT,
+      }
+    );
 
     if (!categoria) return res.status(404).json({ error: "Categoría no encontrada" });
 

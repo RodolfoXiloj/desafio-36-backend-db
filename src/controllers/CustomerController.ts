@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import sequelize from "../config/db";
-import Customer from "../models/Customer";
+import { QueryTypes } from "sequelize";
 
 export const createClient = async (req: Request, res: Response) => {
   const { razon_social, nombre_comercial, direccion_entrega, telefono, email } = req.body;
@@ -65,7 +65,10 @@ export const updateClient = async (req: Request, res: Response) => {
 
 export const getAllClientes = async (req: Request, res: Response) => {
   try {
-    const clientes = await Customer.findAll();
+    const clientes = await sequelize.query(
+      `SELECT * FROM vw_Clientes`,
+      { type: QueryTypes.SELECT }
+    );
     res.json(clientes);
   } catch (error) {
     res.status(500).json({ error: "Error al obtener clientes" });
@@ -75,8 +78,14 @@ export const getAllClientes = async (req: Request, res: Response) => {
 export const getClienteById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const cliente = await Customer.findByPk(id);
-
+    const [cliente] = await sequelize.query(
+      `SELECT * FROM vw_Clientes WHERE id_clientes = :id`,
+      {
+        replacements: { id },
+        type: QueryTypes.SELECT,
+      }
+    );
+    
     if (!cliente) return res.status(404).json({ error: "Cliente no encontrado" });
 
     res.json(cliente);

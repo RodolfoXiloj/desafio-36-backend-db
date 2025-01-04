@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
 import sequelize from "../config/db";
-import Product from "../models/Product";
-import OrderDetail from "../models/OrderDetail";
-import Order from "../models/Order";
+import { QueryTypes } from "sequelize";
 
 export const createOrderWithDetails = async (req: Request, res: Response) => {
   const { usuarios_idusuarios, id_estados, nombre_completo, direccion, telefono, correo_electronico, fecha_entrega, total_orden, detalles } = req.body;
@@ -69,14 +67,10 @@ export const updateOrderWithDetails = async (req: Request, res: Response) => {
 
 export const getAllOrdenes = async (req: Request, res: Response) => {
   try {
-    const ordenes = await Order.findAll({
-      include: [
-        {
-          model: OrderDetail,
-          include: [{ model: Product }],
-        },
-      ],
-    });
+    const ordenes = await sequelize.query(
+      `SELECT * FROM vw_Ordenes`,
+      { type: QueryTypes.SELECT }
+    );
     res.json(ordenes);
   } catch (error) {
     res.status(500).json({ error: "Error al obtener órdenes" });
@@ -86,19 +80,27 @@ export const getAllOrdenes = async (req: Request, res: Response) => {
 export const getOrdenById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const orden = await Order.findOne({
-      where: { id_orden: id },
-      include: [
-        {
-          model: OrderDetail,
-          include: [{ model: Product }],
-        },
-      ],
-    });
+    const [orden] = await sequelize.query(
+      `SELECT * FROM vw_Ordenes WHERE id_orden = :id`,
+      {
+        replacements: { id },
+        type: QueryTypes.SELECT,
+      }
+    );
 
     if (!orden) return res.status(404).json({ error: "Orden no encontrada" });
 
-    res.json(orden);
+    const detalles = await sequelize.query(
+      `SELECT * FROM vw_OrdenDetalles WHERE id_orden = :id`,
+      {
+        replacements: { id },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    if (!orden) return res.status(404).json({ error: "Orden no encontrada" });
+
+    res.json({ orden, detalles });
   } catch (error) {
     res.status(500).json({ error: "Error al obtener la orden" });
   }
