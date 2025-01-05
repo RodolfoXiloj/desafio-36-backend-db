@@ -21,8 +21,22 @@ import userRoutes from "./routes/userRoutes";
 import orderRoutes from "./routes/orderRoutes";
 import clientRoutes from "./routes/customerRoutes";
 import authRoutes from "./routes/authRoutes";
+import rolesRoutes from "./routes/roleRoutes";
+import cors from "cors";
 
 const app = express();
+
+// Configurar middleware de CORS
+const corsOptions = {
+  origin: ["https://9000-idx-front-desafio360-1735935942824.cluster-fnjdffmttjhy2qqdugh3yehhs2.cloudworkstations.dev"],
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  allowedHeaders: "Content-Type,Authorization",
+  credentials: true,
+};
+/* app.use(cors(corsOptions)); */
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); 
+
 app.use(bodyParser.json());
 
 app.get("/", (req, res) => {
@@ -44,6 +58,8 @@ app.use("/api/usuarios", userRoutes);
 app.use("/api/ordenes", orderRoutes);
 // Rutas de Clientes
 app.use("/api/clientes", clientRoutes);
+// Ruta de Roles
+app.use("/api/roles", rolesRoutes)
 
 // Sincronizar DB
 sequelize.sync().then(() => console.log("Base de datos sincronizada"));

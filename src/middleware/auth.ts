@@ -7,8 +7,6 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
     return res.status(401).json({ error: "Acceso denegado. Token faltante." });
   }
 
-  console.log();
-
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string,  {algorithms: ["HS256"]});
     req.user = decoded;
