@@ -102,6 +102,26 @@ export const updateUser = async (req: Request, res: Response) => {
   }
 };
 
+//Obtener todos los usuarios
+export const getAllUsers = async (req: Request, res: Response) => {
+  try {
+    const usuarios = await sequelize.query(
+      `SELECT * FROM vw_Usuarios`,
+      {
+        type: QueryTypes.SELECT, // Define el tipo de consulta
+      }
+    );
+    
+
+    if (!usuarios) return res.status(404).json({ error: "No se encontraron Usuarios" });
+
+    res.json(usuarios);
+  } catch (error) {
+    res.status(500).json({ error: "Error al buscar usuario" });
+  }
+};
+//
+
 export const getUsuarioById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
